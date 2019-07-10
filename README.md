@@ -137,9 +137,16 @@ tail -F logs/nohup_BERN.out
         * Example: http://bern.korea.ac.kr:8888/?pmid=30429607,29446767&format=json&indent=true
     * Raw text (HTTP POST)
         * POST Address: http://\<YOUR_SERVER_ADDRESS>:8888
-        * Set key, value of a body as follows: 
-             * key: param
-             * value: {"text": "YOUR_TEXT"}
+        * Set key, value of a body as follows:          
+```
+import requests
+import json
+body_data = {"param": json.dumps({"text": "CLAPO syndrome: identification of somatic activating PIK3CA mutations and delineation of the natural history and phenotype. PURPOSE: CLAPO syndrome is a rare vascular disorder characterized by capillary malformation of the lower lip, lymphatic malformation predominant on the face and neck, asymmetry, and partial/generalized overgrowth. Here we tested the hypothesis that, although the genetic cause is not known, the tissue distribution of the clinical manifestations in CLAPO seems to follow a pattern of somatic mosaicism. METHODS: We clinically evaluated a cohort of 13 patients with CLAPO and screened 20 DNA blood/tissue samples from 9 patients using high-throughput, deep sequencing. RESULTS: We identified five activating mutations in the PIK3CA gene in affected tissues from 6 of the 9 patients studied; one of the variants (NM_006218.2:c.248T>C; p.Phe83Ser) has not been previously described in developmental disorders. CONCLUSION: We describe for the first time the presence of somatic activating PIK3CA mutations in patients with CLAPO. We also report an update of the phenotype and natural history of the syndrome."})}
+response = requests.post('http://<YOUR_SERVER_ADDRESS>:8888', data=body_data)
+result_dict = response.json()
+print(result_dict)
+```
+         
  
 ## Result
 <details>
