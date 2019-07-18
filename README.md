@@ -1,4 +1,7 @@
 # BERN
+
+* Server check 2019-7-18 8:20 AM - 9:30 AM (expected) (UTC-0)
+
 Implementation of ["A Neural Named Entity Recognition and Multi-Type Normalization Tool for Biomedical Text Mining" Donghyeon Kim, Jinhyuk Lee, Chan Ho So, Hwisang Jeon, Minbyul Jeong, Yonghwa Choi, Wonjin Yoon, Mujeen Sung and Jaewoo Kang. 2019, IEEE Access](https://doi.org/10.1109/ACCESS.2019.2920708)
 
 ![BERN](https://github.com/donghyeonk/bern/blob/master/bern_overview.jpg?raw=true)
