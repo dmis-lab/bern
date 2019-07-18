@@ -542,6 +542,18 @@ def tell_inputfile(host, port, inputfile):
     return resp
 
 
+def delete_files(dirname):
+    if not os.path.exists(dirname):
+        return
+
+    for f in os.listdir(dirname):
+        f_path = os.path.join(dirname, f)
+        if not os.path.isfile(f_path):
+            continue
+        print('Delete', f_path)
+        os.remove(f_path)
+
+
 class Main:
     def __init__(self, params):
         print(datetime.now().strftime(params.time_format), 'Starting..')
@@ -549,6 +561,9 @@ class Main:
         random.seed(params.seed)
         np.random.seed(params.seed)
         tf.set_random_seed(params.seed)
+
+        print("A GPU is{} available".format(
+            "" if tf.test.is_gpu_available() else " NOT"))
 
         stm_dict = dict()
         stm_dict['params'] = params
@@ -593,12 +608,10 @@ class Main:
             os.mkdir('output')
         else:
             # delete prev. version outputs
-            for f in os.listdir('./output'):
-                f_path = os.path.join('./output', f)
-                if not os.path.isfile(f_path):
-                    continue
-                print('Delete', f_path)
-                os.remove(f_path)
+            delete_files('./output')
+
+        delete_files(os.path.join(params.gnormplus_home, 'input'))
+        delete_files(os.path.join(params.tmvar2_home, 'input'))
 
         print(datetime.now().strftime(params.time_format),
               'Starting server at http://{}:{}'.format(params.ip, params.port))

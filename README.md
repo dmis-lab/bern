@@ -1,7 +1,7 @@
+
+**Done - Server check 2019-7-18 8:20 AM - 9:30 AM (expected) (UTC-0)**
+
 # BERN
-
-* Server check 2019-7-18 8:20 AM - 9:30 AM (expected) (UTC-0)
-
 Implementation of ["A Neural Named Entity Recognition and Multi-Type Normalization Tool for Biomedical Text Mining" Donghyeon Kim, Jinhyuk Lee, Chan Ho So, Hwisang Jeon, Minbyul Jeong, Yonghwa Choi, Wonjin Yoon, Mujeen Sung and Jaewoo Kang. 2019, IEEE Access](https://doi.org/10.1109/ACCESS.2019.2920708)
 
 ![BERN](https://github.com/donghyeonk/bern/blob/master/bern_overview.jpg?raw=true)
@@ -122,6 +122,9 @@ sh load_dicts.sh
 
 * Run BERN server
 ```
+# Check your GPU number(s)
+echo $CUDA_VISIBLE_DEVICES
+
 # Set your GPU number(s)
 export CUDA_VISIBLE_DEVICES=0
 
@@ -310,9 +313,38 @@ tail -F logs/nohup_BERN.out
 </details>
 
 
+## Restart
+```
+# Start GNormPlusServer
+cd ~/bern/GNormPlusJava
+nohup java -Xmx16G -Xms16G -jar GNormPlusServer.jar 18895 2>&1 &
+
+# Start tmVar2Server
+cd ~/bern/tmVarJava
+nohup java -Xmx8G -Xms8G -jar tmVar2Server.jar 18896 2>&1 &
+
+# Start normalizers
+cd ~/bern/
+sh load_dicts.sh
+
+# Check your GPU number(s)
+echo $CUDA_VISIBLE_DEVICES
+
+# Set your GPU number(s)
+export CUDA_VISIBLE_DEVICES=0
+
+# Run BERN
+nohup python3 -u server.py --port 8888 --gnormplus_home ~/bern/GNormPlusJava --gnormplus_port 18895 --tmvar2_home ~/bern/tmVarJava --tmvar2_port 18896 >> logs/nohup_BERN.out 2>&1 &
+
+# Print logs
+tail -F logs/nohup_BERN.out
+```
+
+
 ## Troubleshooting
 * Trouble: It takes a long time to get results. 
     * Solution: Make sure TensorFlow is using a GPU.
+    For more details, visit https://stackoverflow.com/questions/42326748/tensorflow-on-gpu-no-known-devices-despite-cudas-devicequery-returning-a-pas/48079860#48079860
 
 ## Monitoring
 * List processes (every 5s)
