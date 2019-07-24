@@ -5,6 +5,10 @@ import random
 from utils \
     import is_good, is_get_good, send_mail, test_bern_get, test_bern_post, query
 
+FROM_GMAIL_ADDR = 'YOUR_GMAIL_ADDR'
+FROM_GMAIL_ACCOUNT_PASSWORD = 'YOUR_GMAIL_PASSWORD'
+TO_EMAIL_ADDR = 'TO_EMAIL_ADDR'
+
 
 def check_bern(from_gmail, to_email, from_google_account, from_google_password):
     results = list()
@@ -205,5 +209,5 @@ def stress_test(num_threads, wait_seconds, num_try):
 
 
 if __name__ == '__main__':
-    check_bern('FROM_GMAIL_ADDRESS', 'TO_EMAIL_ADDRESS',
-               'FROM_GMAIL_ACCOUNT', 'FROM_GMAIL_PASSWORD')
+    check_bern(FROM_GMAIL_ADDR, TO_EMAIL_ADDR,
+               FROM_GMAIL_ADDR, FROM_GMAIL_ACCOUNT_PASSWORD)

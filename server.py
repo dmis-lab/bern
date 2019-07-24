@@ -529,7 +529,17 @@ def count_entities(data):
 def tell_inputfile(host, port, inputfile):
     sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     sock.setsockopt(socket.IPPROTO_TCP, socket.TCP_NODELAY, 1)
-    sock.connect((host, port))
+    try:
+        sock.connect((host, port))
+    except ConnectionRefusedError as cre:
+        print(cre)
+        from utils import send_mail
+        from service_checker import FROM_GMAIL_ADDR, FROM_GMAIL_ACCOUNT_PASSWORD, \
+            TO_EMAIL_ADDR
+        send_mail(FROM_GMAIL_ADDR, TO_EMAIL_ADDR,
+                  '[BERN] Error: Connection refused',
+                  'inputfile: ' + inputfile,
+                  FROM_GMAIL_ADDR, FROM_GMAIL_ACCOUNT_PASSWORD)
 
     input_str = inputfile
     input_stream = struct.pack('>H', len(input_str)) + input_str.encode('utf-8')
