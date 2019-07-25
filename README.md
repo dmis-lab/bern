@@ -1,5 +1,5 @@
 
-**Done - Server check 2019-7-18 8:20 AM - 9:30 AM (expected) (UTC-0)**
+**Done - Server check 2019-7-18 8:20 AM - 1:30 PM (UTC-0)**
 
 # BERN
 Implementation of ["A Neural Named Entity Recognition and Multi-Type Normalization Tool for Biomedical Text Mining" Donghyeon Kim, Jinhyuk Lee, Chan Ho So, Hwisang Jeon, Minbyul Jeong, Yonghwa Choi, Wonjin Yoon, Mujeen Sung and Jaewoo Kang. 2019, IEEE Access](https://doi.org/10.1109/ACCESS.2019.2920708)
@@ -26,7 +26,7 @@ BERN is available at https://bern.korea.ac.kr.
 * Clone this repo
 ```
 cd
-git clone https://github.com/donghyeonk/bern.git
+git clone https://github.com/dmis-lab/bern.git
 ```
 
 * Install python packages
@@ -41,8 +41,8 @@ cd ~/bern
 wget https://www.ncbi.nlm.nih.gov/CBBresearch/Lu/Demo/tmTools/download/GNormPlus/GNormPlusJava.zip
 unzip GNormPlusJava.zip
 
-wget -O GNormPlusJava/crfpp-0.58.tar.gz https://drive.google.com/uc?id=0B4y35FiV1wh7QVR6VXJ5dWExSTQ
 cd GNormPlusJava
+wget -O ./crfpp-0.58.tar.gz https://drive.google.com/uc?id=0B4y35FiV1wh7QVR6VXJ5dWExSTQ
 tar xvfz crfpp-0.58.tar.gz
 cp -rf CRF++-0.58/* CRF
 cd CRF
@@ -52,7 +52,7 @@ sudo make install
 
 cd ..
 chmod 764 Ab3P
-chmod 764 CRF/crf_test
+# chmod 764 CRF/crf_test
 
 # Set FocusSpecies to 9606 (Human)
 sed -i 's/= All/= 9606/g' setup.txt; echo "FocusSpecies: from All to 9606 (Human)"
@@ -64,11 +64,6 @@ rm crfpp-0.58.tar.gz
 # Download GNormPlusServer.jar
 wget --load-cookies /tmp/cookies.txt "https://docs.google.com/uc?export=download&confirm=$(wget --quiet --save-cookies /tmp/cookies.txt --keep-session-cookies --no-check-certificate 'https://docs.google.com/uc?export=download&id=1g-JlhqeDIlZX5YFk8Y27_M8BXUXcQRSX' -O- | sed -rn 's/.*confirm=([0-9A-Za-z_]+).*/\1\n/p')&id=1g-JlhqeDIlZX5YFk8Y27_M8BXUXcQRSX" -O GNormPlusServer.jar && rm -rf /tmp/cookies.txt
 
-# Download dependencies
-wget https://repo1.maven.org/maven2/org/codehaus/woodstox/woodstox-core-asl/4.1.6/woodstox-core-asl-4.1.6.jar
-wget https://repo1.maven.org/maven2/org/codehaus/woodstox/stax2-api/3.1.4/stax2-api-3.1.4.jar
-wget https://repo1.maven.org/maven2/javax/xml/stream/stax-api/1.0-2/stax-api-1.0-2.jar
-
 # Start GNormPlusServer
 nohup java -Xmx16G -Xms16G -jar GNormPlusServer.jar 18895 2>&1 &
 ```
@@ -76,11 +71,12 @@ nohup java -Xmx16G -Xms16G -jar GNormPlusServer.jar 18895 2>&1 &
 
 * Install tmVar2 & run tmVar2Server.jar
 ```
+cd ~/bern
 wget ftp://ftp.ncbi.nlm.nih.gov/pub/lu/Suppl/tmVar2/tmVarJava.zip
 unzip tmVarJava.zip
 
-wget --no-check-certificate -O tmVarJava/crfpp-0.58.tar.gz https://drive.google.com/uc?id=0B4y35FiV1wh7QVR6VXJ5dWExSTQ
 cd tmVarJava
+wget -O ./crfpp-0.58.tar.gz https://drive.google.com/uc?id=0B4y35FiV1wh7QVR6VXJ5dWExSTQ
 tar xvfz crfpp-0.58.tar.gz
 cp -rf CRF++-0.58/* CRF
 cd CRF
