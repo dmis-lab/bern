@@ -565,7 +565,7 @@ def get_pubtator(bern_dict_list):
 
         for etype in bd['entities']:
             for entity in bd['entities'][etype]:
-                mention = text[entity['start']: entity['end'] + 1]  # STM
+                mention = text[entity['start']: entity['end']]
                 sorted_entities.append(
                     [entity['start'], entity['end'], mention, etype,
                      '|'.join(entity['id'].split('\t'))])
