@@ -163,14 +163,17 @@ class Normalizer:
             for ent_type, locs in entities.items():
                 ent_cnt += len(locs)
                 for loc in locs:
+
+                    loc['end'] += 1
+
                     if ent_type == 'mutation':
                         name = loc['normalizedName']
 
                         if ';' in name:
                             name = name.split(';')[0]
-
                     else:
-                        name = abstract[loc['start']:loc['end']+1]
+                        name = abstract[loc['start']:loc['end']]
+
                     if ent_type in names:
                         names[ent_type].append([name, len(saved_items)])
                     else:
@@ -461,7 +464,7 @@ class Normalizer:
 
                         ent_names = list()
                         for loc in entities:
-                            e_name = abstract_title[loc['start']:loc['end'] + 1]
+                            e_name = abstract_title[loc['start']:loc['end']]
                             if len(e_name) > len(space_type) \
                                     and space_type \
                                     in e_name.lower()[-len(space_type):]:
