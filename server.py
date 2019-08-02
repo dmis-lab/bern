@@ -417,7 +417,7 @@ class GetHandler(BaseHTTPRequestHandler):
               .format(cur_thread_name, time.time() - gnormplus_start_time))
 
         # Move a GNormPlus output file to the tmVar2 input directory
-        shutil.move(output_gnormplus, input_dir_tmvar2)
+        shutil.move(output_gnormplus, input_tmvar2)
 
         # Run tmVar 2.0
         tmvar2_start_time = time.time()
