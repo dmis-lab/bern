@@ -1,6 +1,10 @@
 **Fixed our disease normalizer 2019-08-02**
-1. Download disease_normalizer_190802.jar at https://drive.google.com/open?id=1WzlyBflwkqEAQMKxnxN9qHot9GvBdr3\_ and place the file under normalization/resources/normalizers/disease directory.   
-2. Stop normalizers by running stop_normalizers.sh and restart the normalizers by running load_dicts.sh 
+1. Download disease_normalizer_190802.jar under normalization/resources/normalizers/disease directory.   
+```
+cd <YOUR_BERN_HOME>/normalization/resources/normalizers/disease
+wget --load-cookies /tmp/cookies.txt "https://docs.google.com/uc?export=download&confirm=$(wget --quiet --save-cookies /tmp/cookies.txt --keep-session-cookies --no-check-certificate 'https://docs.google.com/uc?export=download&id=1WzlyBflwkqEAQMKxnxN9qHot9GvBdr3_' -O- | sed -rn 's/.*confirm=([0-9A-Za-z_]+).*/\1\n/p')&id=1WzlyBflwkqEAQMKxnxN9qHot9GvBdr3_" -O disease_normalizer_190802.jar && rm -rf /tmp/cookies.txt
+```
+2. Stop normalizers by running __stop_normalizers.sh__ and restart the normalizers by running __load_dicts.sh__ 
 
 **Done - Server check 2019-07-18 8:20 AM - 1:30 PM (UTC-0)**
 
