@@ -238,13 +238,12 @@ class Normalizer:
 
     def run_normalizers_wrap(self, ent_type, base_name, names, saved_items,
                              cur_thread_name, is_raw_text, results):
-        ent_type, oids = self.run_normalizers(ent_type, base_name, names,
-                                              saved_items, cur_thread_name,
-                                              is_raw_text)
+        oids = self.run_normalizer(ent_type, base_name, names, saved_items,
+                                   cur_thread_name, is_raw_text)
         results.append((ent_type, oids))
 
-    def run_normalizers(self, ent_type, base_name, names, saved_items,
-                        cur_thread_name, is_raw_text):
+    def run_normalizer(self, ent_type, base_name, names, saved_items,
+                       cur_thread_name, is_raw_text):
         start_time = time.time()
         name_ptr = names[ent_type]
         oids = list()
@@ -268,9 +267,16 @@ class Normalizer:
             # 2. Run normalizers
             s = socket.socket()
             s.setsockopt(socket.IPPROTO_TCP, socket.TCP_NODELAY, 1)
-            s.connect((self.HOST, self.DISEASE_PORT))
-            s.send('Start Sieve'.encode('utf-8'))
-            s.recv(bufsize)
+            try:
+                s.connect((self.HOST, self.DISEASE_PORT))
+                s.send('Start Sieve'.encode('utf-8'))
+                s.recv(bufsize)
+            except ConnectionRefusedError as cre:
+                print('Check Sieve jar', cre)
+                os.remove(norm_inp_path)
+                os.remove(norm_abs_path)
+                s.close()
+                return oids
             s.close()
 
             # 3. Read output files of normalizers
@@ -434,7 +440,13 @@ class Normalizer:
             # create socket
             s = socket.socket()
             s.setsockopt(socket.IPPROTO_TCP, socket.TCP_NODELAY, 1)
-            s.connect((self.HOST, self.GENE_PORT))
+            try:
+                s.connect((self.HOST, self.GENE_PORT))
+            except ConnectionRefusedError as cre:
+                print('Check GNormPlus jar', cre)
+                s.close()
+                return oids
+
             _, local_port = s.getsockname()
 
             # 1. Write as input files to normalizers
@@ -549,4 +561,4 @@ class Normalizer:
               '[{}] [{}] {:.3f} sec, {} mention(s)'.format(
                   cur_thread_name, ent_type, time.time() - start_time,
                   len(name_ptr)))
-        return ent_type, oids
+        return oids
