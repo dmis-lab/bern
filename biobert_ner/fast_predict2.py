@@ -13,6 +13,7 @@
     Author: Marc Stogaitis
  """
 import tensorflow as tf
+import threading
 from biobert_ner.utils import Profile
 
 
@@ -25,6 +26,7 @@ class FastPredict:
         self.input_fn = input_fn
         self.next_features = None
         self.predictions = None
+        self.lock = threading.Lock()
 
     def _create_generator(self):
         while not self.closed:
@@ -44,21 +46,23 @@ class FastPredict:
             you still need to make it a batch of 1 by wrapping it in a list
             (i.e. predict([my_feature]), not predict(my_feature)
         """
-        self.next_features = feature_batch
-        batch_size = len(feature_batch)
-        if self.first_run:
-            # self.batch_size = len(feature_batch)
-            self.predictions = self.estimator.predict(
-                input_fn=self.input_fn(self._create_generator))
-            self.first_run = False
-        # elif batch_size != len(feature_batch):
-        #     raise ValueError(
-        #         "All batches must be of the same size. First-batch:" + str(
-        #             batch_size) + " This-batch:" + str(len(feature_batch)))
+        with self.lock:
+            self.next_features = feature_batch
+            batch_size = len(feature_batch)
+            if self.first_run:
+                # self.batch_size = len(feature_batch)
+                self.predictions = self.estimator.predict(
+                    input_fn=self.input_fn(self._create_generator))
+                self.first_run = False
+            # elif batch_size != len(feature_batch):
+            #     raise ValueError(
+            #         "All batches must be of the same size. "
+            #         "First-batch:" + str(batch_size)
+            #         + " This-batch:" + str(len(feature_batch)))
 
-        results = list()
-        for _ in range(batch_size):
-            results.append(next(self.predictions))
+            results = list()
+            for _ in range(batch_size):
+                results.append(next(self.predictions))
         return results
 
     def close(self):

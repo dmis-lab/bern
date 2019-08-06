@@ -265,6 +265,9 @@ def merge_results(data, sent_data, predicDict, logitsDict, rep_ent,
             g_ent = paper['entities']['gene'][:]
             s_ent = paper['entities']['species'][:]
             for d_e in d_ent:
+
+                removed_d_e = False
+
                 for g_e in g_ent:
                     if d_e['end'] == g_e['end'] and d_e['start'] == g_e[
                         'start']:
@@ -288,6 +291,7 @@ def merge_results(data, sent_data, predicDict, logitsDict, rep_ent,
                                     CoNLL_tokenizer(content[:g_e['end']]))])
                         if np.average(d_soft) < np.average(g_soft):
                             paper['entities']['disease'].remove(d_e)
+                            removed_d_e = True
                             break
                         elif np.average(d_soft) > np.average(g_soft):
                             paper['entities']['gene'].remove(g_e)
@@ -318,7 +322,8 @@ def merge_results(data, sent_data, predicDict, logitsDict, rep_ent,
                                     content[:s_e['start']])):len(
                                     CoNLL_tokenizer(content[:s_e['end']]))])
                         if np.average(d_soft) < np.average(s_soft):
-                            paper['entities']['disease'].remove(d_e)
+                            if not removed_d_e:
+                                paper['entities']['disease'].remove(d_e)
                             break
                         elif np.average(d_soft) > np.average(s_soft):
                             paper['entities']['species'].remove(s_e)
@@ -331,6 +336,9 @@ def merge_results(data, sent_data, predicDict, logitsDict, rep_ent,
             c_ent = paper['entities']['drug'][:]
             s_ent = paper['entities']['species'][:]
             for g_e in g_ent:
+
+                removed_g_e = False
+
                 for c_e in c_ent:
                     if c_e['end'] == g_e['end'] and c_e['start'] == g_e[
                         'start']:
@@ -357,6 +365,7 @@ def merge_results(data, sent_data, predicDict, logitsDict, rep_ent,
                             break
                         elif np.average(c_soft) > np.average(g_soft):
                             paper['entities']['gene'].remove(g_e)
+                            removed_g_e = True
                             break
 
                     elif g_e['end'] < c_e['start']:
@@ -384,7 +393,8 @@ def merge_results(data, sent_data, predicDict, logitsDict, rep_ent,
                                     content[:s_e['start']])):len(
                                     CoNLL_tokenizer(content[:s_e['end']]))])
                         if np.average(g_soft) < np.average(s_soft):
-                            paper['entities']['gene'].remove(g_e)
+                            if not removed_g_e:
+                                paper['entities']['gene'].remove(g_e)
                             break
                         elif np.average(g_soft) > np.average(s_soft):
                             paper['entities']['species'].remove(s_e)
@@ -397,6 +407,9 @@ def merge_results(data, sent_data, predicDict, logitsDict, rep_ent,
             d_ent = paper['entities']['disease'][:]
             s_ent = paper['entities']['species'][:]
             for c_e in c_ent:
+
+                removed_c_e = False
+
                 for d_e in d_ent:
                     if c_e['end'] == d_e['end'] and c_e['start'] == d_e[
                         'start']:
@@ -420,6 +433,7 @@ def merge_results(data, sent_data, predicDict, logitsDict, rep_ent,
                                     CoNLL_tokenizer(content[:d_e['end']]))])
                         if np.average(c_soft) < np.average(d_soft):
                             paper['entities']['drug'].remove(c_e)
+                            removed_c_e = True
                             break
                         elif np.average(c_soft) > np.average(d_soft):
                             paper['entities']['disease'].remove(d_e)
@@ -450,7 +464,8 @@ def merge_results(data, sent_data, predicDict, logitsDict, rep_ent,
                                     content[:s_e['start']])):len(
                                     CoNLL_tokenizer(content[:s_e['end']]))])
                         if np.average(c_soft) < np.average(s_soft):
-                            paper['entities']['drug'].remove(c_e)
+                            if not removed_c_e:
+                                paper['entities']['drug'].remove(c_e)
                             break
                         elif np.average(c_soft) > np.average(s_soft):
                             paper['entities']['species'].remove(s_e)
