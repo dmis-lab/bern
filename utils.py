@@ -153,27 +153,36 @@ def send_mail(from_addr, to, subject, content, gmail_id, password):
 
 
 def is_good(num_type_set=3, normal_id_cnt=13):
-    post_res = query_raw('{} {}'.format(
-        'CLAPO syndrome: identification of somatic activating PIK3CA '
-        'mutations '
-        'and delineation of the natural history and phenotype. Purpose CLAPO '
-        'syndrome is a rare vascular disorder characterized by capillary '
-        'malformation of the lower lip, lymphatic malformation predominant '
-        'on the face and neck, asymmetry, and partial/generalized overgrowth. '
-        'Here we tested the hypothesis that, although the genetic cause is '
-        'not known, the tissue distribution of the clinical manifestations '
-        'in CLAPO seems to follow a pattern of somatic mosaicism. Methods We '
-        'clinically evaluated a cohort of 13 patients with CLAPO and screened '
-        '20 DNA blood/tissue samples from 9 patients using high-throughput, '
-        'deep sequencing. Results We identified five activating mutations '
-        'in the PIK3CA gene in affected tissues from 6 of the 9 patients '
-        'studied; one of the variants (NM_006218.2:c.248T>C; p.Phe83Ser) '
-        'has not been previously described in developmental disorders. '
-        'Conclusion We describe for the first time the presence of somatic '
-        'activating PIK3CA mutations in patients with CLAPO. We also report '
-        'an update of the phenotype and natural history of the syndrome. '
-        'Imatinib is a asdf of homo sapiens ...',
-        2019.4))
+    try:
+        # A part of PMID:29446767
+        post_res = query_raw('{} {}'.format(
+            'CLAPO syndrome: identification of somatic activating PIK3CA '
+            'mutations '
+            'and delineation of the natural history and phenotype. Purpose '
+            'CLAPO '
+            'syndrome is a rare vascular disorder characterized by capillary '
+            'malformation of the lower lip, lymphatic malformation predominant '
+            'on the face and neck, asymmetry, and partial/generalized '
+            'overgrowth. '
+            'Here we tested the hypothesis that, although the genetic cause is '
+            'not known, the tissue distribution of the clinical manifestations '
+            'in CLAPO seems to follow a pattern of somatic mosaicism.'
+            ' Methods We '
+            'clinically evaluated a cohort of 13 patients with CLAPO and '
+            'screened '
+            '20 DNA blood/tissue samples from 9 patients using '
+            'high-throughput, '
+            'deep sequencing. Results We identified five activating mutations '
+            'in the PIK3CA gene in affected tissues from 6 of the 9 patients '
+            'studied; one of the variants (NM_006218.2:c.248T>C; p.Phe83Ser) '
+            'has not been previously described in developmental disorders. '
+            'Conclusion We describe for the first time the presence of somatic '
+            'activating PIK3CA mutations in patients with CLAPO. We also '
+            'report '
+            'an update of the phenotype and natural history of the syndrome. '
+            'Imatinib is a asdf of homo sapiens ...', 2019.8))
+    except requests.exceptions.ConnectionError:
+        return 'ConnectionError'
 
     if 'denotations' not in post_res:
         print('No denotations')
