@@ -1,5 +1,5 @@
-**Fixed our disease normalizer 2019-08-02**
-1. Download disease_normalizer_190802.jar at [this URL](https://drive.google.com/open?id=1WzlyBflwkqEAQMKxnxN9qHot9GvBdr3\_) and place the file under normalization/resources/normalizers/disease directory.   
+**Fixed our disease normalizer 2019-08-10 and 2019-08-02 issues**
+1. Download disease_normalizer_190810.jar at [this URL](https://drive.google.com/open?id=1dh7EINiX0MGnARcSl4l8eX3qZJcugcyI) and place the file under normalization/resources/normalizers/disease directory.   
 2. Stop normalizers by running stop_normalizers.sh and restart the normalizers by running load_dicts.sh 
 
 **Done - Server check 2019-07-18 8:20 AM - 1:30 PM (UTC-0)**
