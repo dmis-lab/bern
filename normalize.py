@@ -269,7 +269,7 @@ class Normalizer:
             s.setsockopt(socket.IPPROTO_TCP, socket.TCP_NODELAY, 1)
             try:
                 s.connect((self.HOST, self.DISEASE_PORT))
-                s.send('Start Sieve'.encode('utf-8'))
+                s.send('Start Sieve {}'.format(cur_thread_name).encode('utf-8'))
                 s.recv(bufsize)
             except ConnectionRefusedError as cre:
                 print('Check Sieve jar', cre)
@@ -314,9 +314,9 @@ class Normalizer:
                             else:
                                 oids.append(self.NO_ENTITY_ID)
 
-            # 4. Remove input files
-            os.remove(norm_inp_path)
-            os.remove(norm_abs_path)
+            # # 4. Remove input files
+            # os.remove(norm_inp_path)
+            # os.remove(norm_abs_path)
 
             # 5. Remove output files
             os.remove(norm_out_path)

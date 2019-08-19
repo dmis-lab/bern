@@ -6,7 +6,7 @@ nohup python3 normalizers/mutation_normalizer.py >> logs/nohup_mutation.out 2>&1
 
 # Disease (working dir: normalization/)
 cd normalization
-nohup java -Xmx16G -jar resources/normalizers/disease/disease_normalizer_190810.jar >> ../logs/nohup_disease.out 2>&1 &
+nohup java -Xmx16G -jar resources/normalizers/disease/disease_normalizer_190819.jar >> ../logs/nohup_disease.out 2>&1 &
 
 # Gene (working dir: normalization/resources/normalizers/gene/, port:18888)
 cd resources/normalizers/gene/
