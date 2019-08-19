@@ -221,7 +221,7 @@ def is_get_good(pmid, output_format, num_type_set, normal_id_cnt):
     if type(get_res) is str:
         return get_res
 
-    if not get_res:
+    if not get_res or len(get_res) == 0:
         return 'no result'
 
     if 'error: tmtool:' in get_res[0]['text']:
