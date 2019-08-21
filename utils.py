@@ -217,11 +217,14 @@ def is_get_good(pmid, output_format, num_type_set, normal_id_cnt):
     if output_format.lower() == 'pubtator':
         get_res = pubtator2pubannotation(get_res)
 
-    # get_res should be a list
     if type(get_res) is str:
         return get_res
 
-    if not get_res or len(get_res) == 0:
+    # get_res should be a list
+    if type(get_res) is not list:
+        return 'no list: {}'.format(type(get_res))
+
+    if not get_res:
         return 'no result'
 
     if 'error: tmtool:' in get_res[0]['text']:

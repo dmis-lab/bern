@@ -153,9 +153,11 @@ class Normalizer:
             if not is_raw_text:
                 # Title goes with abstract
                 if len(abstract) > 0:
-                    abstract = ' '.join([item['title'], abstract])
+                    content = ' '.join([item['title'], abstract])
                 else:
-                    abstract = item['title']
+                    content = item['title']
+            else:
+                content = abstract
 
             abs_cnt += 1
 
@@ -172,7 +174,7 @@ class Normalizer:
                         if ';' in name:
                             name = name.split(';')[0]
                     else:
-                        name = abstract[loc['start']:loc['end']]
+                        name = content[loc['start']:loc['end']]
 
                     if ent_type in names:
                         names[ent_type].append([name, len(saved_items)])
@@ -191,12 +193,12 @@ class Normalizer:
         # 5. Return oids
 
         # Threading
-        oids = list()
+        results = list()
         threads = list()
         for ent_type in names.keys():
             t = threading.Thread(target=self.run_normalizers_wrap,
                                  args=(ent_type, base_name, names, saved_items,
-                                       cur_thread_name, is_raw_text, oids))
+                                       cur_thread_name, is_raw_text, results))
             t.daemon = True
             t.start()
             threads.append(t)
@@ -207,7 +209,7 @@ class Normalizer:
 
         # Save oids
         cui_less_dict = dict()
-        for ent_type, type_oids in oids:
+        for ent_type, type_oids in results:
             oid_cnt = 0
             for saved_item in saved_items:
                 for loc in saved_item['entities'][ent_type]:
@@ -238,9 +240,10 @@ class Normalizer:
 
     def run_normalizers_wrap(self, ent_type, base_name, names, saved_items,
                              cur_thread_name, is_raw_text, results):
-        oids = self.run_normalizer(ent_type, base_name, names, saved_items,
-                                   cur_thread_name, is_raw_text)
-        results.append((ent_type, oids))
+        results.append((ent_type,
+                        self.run_normalizer(ent_type, base_name, names,
+                                            saved_items, cur_thread_name,
+                                            is_raw_text)))
 
     def run_normalizer(self, ent_type, base_name, names, saved_items,
                        cur_thread_name, is_raw_text):
@@ -282,44 +285,46 @@ class Normalizer:
             # 3. Read output files of normalizers
             norm_out_path = os.path.join(self.NORM_OUTPUT_DIR[ent_type],
                                          base_thread_name + '.oid')
-            with open(norm_out_path, 'r') as norm_out_f:
-                for line in norm_out_f:
-                    disease_ids = line.rstrip()
+            if os.path.exists(norm_out_path):
+                with open(norm_out_path, 'r') as norm_out_f:
+                    for line in norm_out_f:
+                        disease_ids = line.rstrip()
 
-                    if '|' in disease_ids:  # multiple
-                        bern_disease_ids = list()
-                        ext_id_list = list()
-                        for did in disease_ids.split('|'):
-                            bern_disease_ids.append(did)
-                            disease_ext_id = self.did2meta.get(did, '')
-                            if disease_ext_id != '':
-                                ext_id_list.append(disease_ext_id)
+                        if '|' in disease_ids:  # multiple
+                            bern_disease_ids = list()
+                            ext_id_list = list()
+                            for did in disease_ids.split('|'):
+                                bern_disease_ids.append(did)
+                                disease_ext_id = self.did2meta.get(did, '')
+                                if disease_ext_id != '':
+                                    ext_id_list.append(disease_ext_id)
 
-                        bern_dids = '\t'.join(
-                            ['BERN:{}'.format(did) for did in bern_disease_ids])
-                        if len(ext_id_list) > 0:
-                            oids.append(
-                                '\t'.join(ext_id_list) + '\t' + bern_dids)
-                        else:
-                            oids.append(bern_dids)
-
-                    else:  # single
-                        disease_ext_id = self.did2meta.get(disease_ids, '')
-                        if disease_ext_id != '':
-                            oids.append(
-                                disease_ext_id + '\tBERN:' + disease_ids)
-                        else:
-                            if disease_ids != self.NO_ENTITY_ID:
-                                oids.append('BERN:' + disease_ids)
+                            bern_dids = '\t'.join(
+                                ['BERN:{}'.format(did)
+                                 for did in bern_disease_ids])
+                            if len(ext_id_list) > 0:
+                                oids.append(
+                                    '\t'.join(ext_id_list) + '\t' + bern_dids)
                             else:
-                                oids.append(self.NO_ENTITY_ID)
+                                oids.append(bern_dids)
 
-            # # 4. Remove input files
-            # os.remove(norm_inp_path)
-            # os.remove(norm_abs_path)
+                        else:  # single
+                            disease_ext_id = self.did2meta.get(disease_ids, '')
+                            if disease_ext_id != '':
+                                oids.append(
+                                    disease_ext_id + '\tBERN:' + disease_ids)
+                            else:
+                                if disease_ids != self.NO_ENTITY_ID:
+                                    oids.append('BERN:' + disease_ids)
+                                else:
+                                    oids.append(self.NO_ENTITY_ID)
+                os.remove(norm_out_path)
+            else:
+                print('Not found!!!', norm_out_path)
 
-            # 5. Remove output files
-            os.remove(norm_out_path)
+                # Sad error handling
+                for _ in range(len(name_ptr)):
+                    oids.append(self.NO_ENTITY_ID)
 
         elif ent_type == 'drug':
             # 1. Write as input files to normalizers
@@ -545,6 +550,7 @@ class Normalizer:
                 os.remove(norm_out_path)
             else:
                 print('Not found!!!', norm_out_path)
+
                 # Sad error handling
                 for _ in range(len(name_ptr)):
                     oids.append(self.NO_ENTITY_ID)
