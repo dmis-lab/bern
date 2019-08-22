@@ -272,7 +272,7 @@ class Normalizer:
             s.setsockopt(socket.IPPROTO_TCP, socket.TCP_NODELAY, 1)
             try:
                 s.connect((self.HOST, self.DISEASE_PORT))
-                s.send('Start Sieve {}'.format(cur_thread_name).encode('utf-8'))
+                s.send('{}'.format(base_thread_name).encode('utf-8'))
                 s.recv(bufsize)
             except ConnectionRefusedError as cre:
                 print('Check Sieve jar', cre)
