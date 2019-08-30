@@ -124,15 +124,17 @@ class Normalizer:
         print('chem meta #ids {}, #ext_ids {}'.format(len(self.cid2meta),
                                                       chem_ext_ids))
 
-        self.NORM_MODEL_VERSION = 'dmis ne norm v.20190310'
+        self.NORM_MODEL_VERSION = 'dmis ne norm v.20190830'
 
         self.HOST = '127.0.0.1'
 
+        # normalizer port
         self.GENE_PORT = 18888
         self.SPECIES_PORT = 18889
         self.CHEMICAL_PORT = 18890
         self.MUT_PORT = 18891
         self.DISEASE_PORT = 18892
+
         self.NO_ENTITY_ID = 'CUI-less'
 
     def normalize(self, base_name, doc_dict_list, cur_thread_name, is_raw_text):
@@ -208,27 +210,14 @@ class Normalizer:
             t.join()
 
         # Save oids
-        cui_less_dict = dict()
         for ent_type, type_oids in results:
             oid_cnt = 0
             for saved_item in saved_items:
                 for loc in saved_item['entities'][ent_type]:
-                    # Calculate CUI-less
-                    if type_oids[oid_cnt] == self.NO_ENTITY_ID:
-                        if ent_type not in cui_less_dict:
-                            cui_less_dict[ent_type] = 1
-                        else:
-                            cui_less_dict[ent_type] += 1
 
                     # Put oid
                     loc['id'] = type_oids[oid_cnt]
                     oid_cnt += 1
-            if ent_type in cui_less_dict:
-                print(datetime.now().strftime(time_format),
-                      '[{}] Normalizer [{}] {} ratio: {:.3f} ({}/{})'
-                      .format(cur_thread_name, ent_type, self.NO_ENTITY_ID,
-                              (cui_less_dict.get(ent_type, 0) / len(type_oids)),
-                              cui_less_dict.get(ent_type, 0), len(type_oids)))
 
         print(datetime.now().strftime(time_format),
               '[{}] Normalization models '
@@ -452,14 +441,11 @@ class Normalizer:
                 s.close()
                 return oids
 
-            _, local_port = s.getsockname()
-
             # 1. Write as input files to normalizers
-            base_thread_port_name = '{}_{}'.format(base_thread_name, local_port)
             norm_inp_path = os.path.join(self.NORM_INPUT_DIR[ent_type],
-                                         base_thread_port_name + '.concept')
+                                         base_thread_name + '.concept')
             norm_abs_path = os.path.join(self.NORM_INPUT_DIR[ent_type],
-                                         base_thread_port_name + '.txt')
+                                         base_thread_name + '.txt')
 
             space_type = ' ' + ent_type
             with open(norm_inp_path, 'w') as norm_inp_f:
@@ -503,7 +489,8 @@ class Normalizer:
 
             # start jar
             jar_args = '\t'.join(
-                [gene_input_dir, gene_output_dir, setup_dir]) + '\n'
+                [gene_input_dir, gene_output_dir, setup_dir, '9606',  # human
+                 base_thread_name]) + '\n'
             s.send(jar_args.encode('utf-8'))
             s.recv(bufsize)
             s.close()
@@ -513,7 +500,7 @@ class Normalizer:
                 load_auxiliary_dict(self.NORM_DICT_PATH['gene'][2])
             gene_freq_dict = load_auxiliary_dict(self.NORM_DICT_PATH['gene'][3])
             norm_out_path = os.path.join(gene_output_dir,
-                                         base_thread_port_name + '.oid')
+                                         base_thread_name + '.oid')
             if os.path.exists(norm_out_path):
                 with open(norm_out_path, 'r') as norm_out_f, \
                         open(norm_inp_path, 'r') as norm_in_f:
@@ -563,8 +550,20 @@ class Normalizer:
         assert len(oids) == len(name_ptr), '{} vs {} in {}'.format(
             len(oids), len(name_ptr), ent_type)
 
+        # double checking
+        if 0 == len(oids):
+            return oids
+
+        cui_less_count = 0
+        for oid in oids:
+            if self.NO_ENTITY_ID == oid:
+                cui_less_count += 1
+
         print(datetime.now().strftime(time_format),
-              '[{}] [{}] {:.3f} sec, {} mention(s)'.format(
+              '[{}] [{}] {:.3f} sec, {} mention(s)'
+              ', CUI-less: {:.1f}% ({}/{})'.format(
                   cur_thread_name, ent_type, time.time() - start_time,
-                  len(name_ptr)))
+                  len(name_ptr),
+                  cui_less_count * 100. / len(oids),
+                  cui_less_count, len(oids)))
         return oids
