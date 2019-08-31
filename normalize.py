@@ -560,10 +560,8 @@ class Normalizer:
                 cui_less_count += 1
 
         print(datetime.now().strftime(time_format),
-              '[{}] [{}] {:.3f} sec, {} mention(s)'
-              ', CUI-less: {:.1f}% ({}/{})'.format(
+              '[{}] [{}] {:.3f} sec, CUI-less: {:.1f}% ({}/{})'.format(
                   cur_thread_name, ent_type, time.time() - start_time,
-                  len(name_ptr),
                   cui_less_count * 100. / len(oids),
                   cui_less_count, len(oids)))
         return oids
