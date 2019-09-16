@@ -257,9 +257,10 @@ def is_get_good(pmid, output_format, num_type_set, normal_id_cnt):
             pmid, output_format.lower(), num_type_set, len(type_set))
 
     if id_cnt != normal_id_cnt:
-        print('Found a normalization problem:', normal_id_cnt, '!=', id_cnt)
-        return 'pmid: {}, {}, normalizer problem, {} != {}'.format(
-            pmid, output_format.lower(), normal_id_cnt, id_cnt)
+        print('Found a normalization problem: got', id_cnt,
+              'expected', normal_id_cnt)
+        return 'pmid: {}, {}, normalizer problem, got {} expected {}'.format(
+            pmid, output_format.lower(), id_cnt, normal_id_cnt)
 
     return 'success'
 
