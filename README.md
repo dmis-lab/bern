@@ -1,5 +1,5 @@
 # BERN
-Implementation of ["A Neural Named Entity Recognition and Multi-Type Normalization Tool for Biomedical Text Mining" Donghyeon Kim, Jinhyuk Lee, Chan Ho So, Hwisang Jeon, Minbyul Jeong, Yonghwa Choi, Wonjin Yoon, Mujeen Sung and Jaewoo Kang. 2019, IEEE Access](https://doi.org/10.1109/ACCESS.2019.2920708)
+Implementation of ["A Neural Named Entity Recognition and Multi-Type Normalization Tool for Biomedical Text Mining" Donghyeon Kim, Jinhyuk Lee, Chan Ho So, Hwisang Jeon, Minbyul Jeong, Yonghwa Choi, Wonjin Yoon, Mujeen Sung and Jaewoo Kang. 2019, IEEE Access](https://doi.org/10.1109/ACCESS.2019.2920708)  
 [DMIS Lab.](https://dmis.korea.ac.kr)  
 Korea University  
 
