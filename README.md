@@ -1,7 +1,7 @@
 # BERN
 Implementation of ["A Neural Named Entity Recognition and Multi-Type Normalization Tool for Biomedical Text Mining" Donghyeon Kim, Jinhyuk Lee, Chan Ho So, Hwisang Jeon, Minbyul Jeong, Yonghwa Choi, Wonjin Yoon, Mujeen Sung and Jaewoo Kang. 2019, IEEE Access](https://doi.org/10.1109/ACCESS.2019.2920708)  
   
-[DMIS Laboratory](https://dmis.korea.ac.kr)  
+[DMIS Laboratory](https://dmis.korea.ac.kr) @ Korea University  
 
 **Fixed our disease normalizer 2019-08-19, 2019-08-10 and 2019-08-02 issues**
 1. Download disease_normalizer_19.jar at [this URL](https://drive.google.com/open?id=1YbAanyQJ24PPBOu0NO8a1aCxWLdlQhk-) and place the file under normalization/resources/normalizers/disease directory.   
