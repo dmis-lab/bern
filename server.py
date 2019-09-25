@@ -467,7 +467,7 @@ class GetHandler(BaseHTTPRequestHandler):
 
         # Save a BERN result
         with open(bern_output_path, 'w', encoding='utf-8') as f_out:
-            json.dump(tagged_docs[0], f_out)
+            json.dump(tagged_docs[0], f_out, sort_keys=True)
 
         return tagged_docs[0]
 
