@@ -385,10 +385,17 @@ donghyeon@korea.ac.kr
   publisher={IEEE}
 }
 
-@article{lee2019biobert,
-  title={BioBERT: pre-trained biomedical language representation model for biomedical text mining},
-  author={Lee, Jinhyuk and Yoon, Wonjin and Kim, Sungdong and Kim, Donghyeon and Kim, Sunkyu and So, Chan Ho and Kang, Jaewoo},
-  journal={arXiv preprint arXiv:1901.08746},
-  year={2019}
+@article{10.1093/bioinformatics/btz682,
+    author = {Lee, Jinhyuk and Yoon, Wonjin and Kim, Sungdong and Kim, Donghyeon and Kim, Sunkyu and So, Chan Ho and Kang, Jaewoo},
+    title = "{BioBERT: a pre-trained biomedical language representation model for biomedical text mining}",
+    journal = {Bioinformatics},
+    year = {2019},
+    month = {09},
+    abstract = "{Biomedical text mining is becoming increasingly important as the number of biomedical documents rapidly grows. With the progress in natural language processing, extracting valuable information from biomedical literature has gained popularity among researchers, and deep learning has boosted the development of effective biomedical text mining models. However, directly applying the advancements in natural language processing to biomedical text mining often yields unsatisfactory results due to a word distribution shift from general domain corpora to biomedical corpora. In this paper, we investigate how the recently introduced pre-trained language model BERT can be adapted for biomedical corpora.We introduce BioBERT (Bidirectional Encoder Representations from Transformers for Biomedical Text Mining), which is a domain specific language representation model pre-trained on large-scale biomedical corpora. With almost the same architecture across tasks, BioBERT largely outperforms BERT and previous state-of-the-art models in a variety of biomedical text mining tasks when pre-trained on biomedical corpora. While BERT obtains performance comparable to that of previous state-of-the-art models, BioBERT significantly outperforms them on the following three representative biomedical text mining tasks: biomedical named entity recognition (0.62\\% F1 score improvement), biomedical relation extraction (2.80\\% F1 score improvement), and biomedical question answering (12.24\\% MRR improvement). Our analysis results show that pre-training BERT on biomedical corpora helps it to understand complex biomedical texts.We make the pre-trained weights of BioBERT freely available at https://github.com/naver/biobert-pretrained, and the source code for fine-tuning BioBERT available at https://github.com/dmis-lab/biobert.Supplementary data are available at Bioinformatics online.}",
+    issn = {1367-4803},
+    doi = {10.1093/bioinformatics/btz682},
+    url = {https://doi.org/10.1093/bioinformatics/btz682},
+    note = {btz682},
+    eprint = {http://oup.prod.sis.lan/bioinformatics/advance-article-pdf/doi/10.1093/bioinformatics/btz682/29955682/btz682.pdf},
 }
 ```
