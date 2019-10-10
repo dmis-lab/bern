@@ -1,7 +1,5 @@
 # BERN
-Implementation of ["A Neural Named Entity Recognition and Multi-Type Normalization Tool for Biomedical Text Mining" Donghyeon Kim, Jinhyuk Lee, Chan Ho So, Hwisang Jeon, Minbyul Jeong, Yonghwa Choi, Wonjin Yoon, Mujeen Sung and Jaewoo Kang. 2019, IEEE Access](https://doi.org/10.1109/ACCESS.2019.2920708)  
-  
-[DMIS Laboratory](https://dmis.korea.ac.kr) @ Korea University  
+BERN is a BioBERT-based multi-type NER tool that also supports normalization of extracted entities. This repository contains the official implementation of BERN. You can use BERN at https://bern.korea.ac.kr, or host your own server by following the description below. Please refer to our [paper (Kim et al., IEEE Access 2019)](https://doi.org/10.1109/ACCESS.2019.2920708) for more details. This project is done by [DMIS Laboratory](https://dmis.korea.ac.kr) at Korea University.
 
 **Fixed our disease normalizer 2019-08-19, 2019-08-10 and 2019-08-02 issues**
 1. Download disease_normalizer_19.jar at [this URL](https://drive.google.com/open?id=1YbAanyQJ24PPBOu0NO8a1aCxWLdlQhk-) and place the file under normalization/resources/normalizers/disease directory.   
@@ -12,8 +10,9 @@ Implementation of ["A Neural Named Entity Recognition and Multi-Type Normalizati
 ![BERN](https://github.com/donghyeonk/bern/blob/master/bern_overview.jpg?raw=true)
 <p align="center">Overview of BERN.</p>
 
-BERN is available at https://bern.korea.ac.kr.
+The description below gives instructions on hosting your own BERN. Please refer to https://bern.korea.ac.kr for the RESTful Web service of BERN.
 
+## Requirements
 * Environment
     * Python 3
     * CUDA 9 or higher
@@ -23,9 +22,8 @@ BERN is available at https://bern.korea.ac.kr.
     * [GNormPlus (Wei et al., 2015)](https://www.ncbi.nlm.nih.gov/research/bionlp/Tools/gnormplus/)
     * [tmVar 2.0 (Wei et al., 2018)](https://www.ncbi.nlm.nih.gov/research/bionlp/Tools/tmvar/)
     * [TensorFlow 1.13.1](https://github.com/tensorflow/tensorflow/releases/tag/v1.13.1)
-* Requirements
-    * 66 GB of free disk space
-    * 32 GB or more RAM
+
+Note that you will need at least 66 GB of free disk space and 32 GB or more RAM.
 
 ##  Installation
 * Clone this repo
@@ -391,11 +389,8 @@ donghyeon@korea.ac.kr
     journal = {Bioinformatics},
     year = {2019},
     month = {09},
-    abstract = "{Biomedical text mining is becoming increasingly important as the number of biomedical documents rapidly grows. With the progress in natural language processing, extracting valuable information from biomedical literature has gained popularity among researchers, and deep learning has boosted the development of effective biomedical text mining models. However, directly applying the advancements in natural language processing to biomedical text mining often yields unsatisfactory results due to a word distribution shift from general domain corpora to biomedical corpora. In this paper, we investigate how the recently introduced pre-trained language model BERT can be adapted for biomedical corpora.We introduce BioBERT (Bidirectional Encoder Representations from Transformers for Biomedical Text Mining), which is a domain specific language representation model pre-trained on large-scale biomedical corpora. With almost the same architecture across tasks, BioBERT largely outperforms BERT and previous state-of-the-art models in a variety of biomedical text mining tasks when pre-trained on biomedical corpora. While BERT obtains performance comparable to that of previous state-of-the-art models, BioBERT significantly outperforms them on the following three representative biomedical text mining tasks: biomedical named entity recognition (0.62\\% F1 score improvement), biomedical relation extraction (2.80\\% F1 score improvement), and biomedical question answering (12.24\\% MRR improvement). Our analysis results show that pre-training BERT on biomedical corpora helps it to understand complex biomedical texts.We make the pre-trained weights of BioBERT freely available at https://github.com/naver/biobert-pretrained, and the source code for fine-tuning BioBERT available at https://github.com/dmis-lab/biobert.Supplementary data are available at Bioinformatics online.}",
     issn = {1367-4803},
     doi = {10.1093/bioinformatics/btz682},
     url = {https://doi.org/10.1093/bioinformatics/btz682},
-    note = {btz682},
-    eprint = {http://oup.prod.sis.lan/bioinformatics/advance-article-pdf/doi/10.1093/bioinformatics/btz682/29955682/btz682.pdf},
 }
 ```
