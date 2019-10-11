@@ -1,7 +1,7 @@
 # BERN
 BERN is a BioBERT-based multi-type NER tool that also supports normalization of extracted entities. This repository contains the official implementation of BERN. You can use BERN at https://bern.korea.ac.kr, or host your own server by following the description below. Please refer to our [paper (Kim et al., IEEE Access 2019)](https://doi.org/10.1109/ACCESS.2019.2920708) for more details. This project is done by [DMIS Laboratory](https://dmis.korea.ac.kr) at Korea University.
 
-**Server down due to air conditioning problems in our server room 2019-10-10 - (TBA) (UTC-0)**  
+**Done - Server down due to air conditioning problems in our server room 2019-10-10 - 2019-10-11 7:55 AM (UTC-0)**  
 
 **Fixed our disease normalizer 2019-08-19, 2019-08-10 and 2019-08-02 issues**
 1. Download disease_normalizer_19.jar at [this URL](https://drive.google.com/open?id=1YbAanyQJ24PPBOu0NO8a1aCxWLdlQhk-) and place the file under normalization/resources/normalizers/disease directory.   
