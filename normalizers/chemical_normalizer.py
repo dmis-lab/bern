@@ -5,7 +5,6 @@ import string
 
 CHEMICAL_PORT = 18890
 chem2oid = None
-# os.chdir('../../../')
 
 
 def run_server(logic_func, port):
@@ -24,14 +23,14 @@ def run_server(logic_func, port):
 
 
 def run_normalizer(data, _):
-    args = data.split(' ')
-    assert len(args) == 3
-    input_dir, output_dir, dict_path = args
+    args = data.split('\t')
+    assert len(args) == 5
+    input_dir, input_filename, output_dir, output_filename, dict_path = args
 
     global chem2oid
     if chem2oid is None:
         # Create dictionary for exact match
-        chem2oid = {}
+        chem2oid = dict()
         with open(dict_path, 'r', encoding='utf-8') as f:
             for line in f:
                 oid, names = line[:-1].split('||')
@@ -40,28 +39,26 @@ def run_normalizer(data, _):
                     # a part of tmChem normalization
                     chem2oid[get_tmchem_name(name)] = oid
 
-    for filename in os.listdir(input_dir):
-        oids = []
-        # Read names and get oids
-        with open(os.path.join(input_dir, filename), 'r',
-                  encoding='utf-8') as f:
-            for line in f:
-                name = line[:-1]
+    oids = list()
+    # Read names and get oids
+    with open(os.path.join(input_dir, input_filename), 'r',
+              encoding='utf-8') as f:
+        for line in f:
+            name = line[:-1]
 
-                # a part of tmChem normalization
-                normalized_name = get_tmchem_name(name)
+            # a part of tmChem normalization
+            normalized_name = get_tmchem_name(name)
 
-                if normalized_name in chem2oid:
-                    oids.append(chem2oid[normalized_name])
-                else:
-                    oids.append('CUI-less')
+            if normalized_name in chem2oid:
+                oids.append(chem2oid[normalized_name])
+            else:
+                oids.append('CUI-less')
 
-        # Write to file
-        with open(os.path.join(
-                output_dir, os.path.splitext(filename)[0] + '.oid'), 'w',
-                encoding='utf-8') as f:
-            for oid in oids:
-                f.write(oid + '\n')
+    # Write to file
+    with open(os.path.join(output_dir, output_filename), 'w',
+              encoding='utf-8') as f_out:
+        for oid in oids:
+            f_out.write(oid + '\n')
 
 
 def get_tmchem_name(name):

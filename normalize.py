@@ -242,11 +242,14 @@ class Normalizer:
         bufsize = 4
 
         base_thread_name = '{}_{}'.format(base_name, cur_thread_name)
+        input_filename = base_thread_name + '.concept'
+        output_filename = base_thread_name + '.oid'
+
         if ent_type == 'disease':
 
             # 1. Write as input files to normalizers
             norm_inp_path = os.path.join(self.NORM_INPUT_DIR[ent_type],
-                                         base_thread_name + '.concept')
+                                         input_filename)
             norm_abs_path = os.path.join(self.NORM_INPUT_DIR[ent_type],
                                          base_thread_name + '.txt')
             with open(norm_inp_path, 'w') as norm_inp_f:
@@ -273,7 +276,7 @@ class Normalizer:
 
             # 3. Read output files of normalizers
             norm_out_path = os.path.join(self.NORM_OUTPUT_DIR[ent_type],
-                                         base_thread_name + '.oid')
+                                         output_filename)
             if os.path.exists(norm_out_path):
                 with open(norm_out_path, 'r') as norm_out_f:
                     for line in norm_out_f:
@@ -318,7 +321,7 @@ class Normalizer:
         elif ent_type == 'drug':
             # 1. Write as input files to normalizers
             norm_inp_path = os.path.join(self.NORM_INPUT_DIR[ent_type],
-                                         base_thread_name + '.concept')
+                                         input_filename)
             with open(norm_inp_path, 'w') as norm_inp_f:
                 for name, _ in name_ptr:
                     norm_inp_f.write(name + '\n')
@@ -327,8 +330,10 @@ class Normalizer:
             s = socket.socket()
             s.setsockopt(socket.IPPROTO_TCP, socket.TCP_NODELAY, 1)
             s.connect((self.HOST, self.CHEMICAL_PORT))
-            send_args = ' '.join([self.NORM_INPUT_DIR[ent_type],
+            send_args = '\t'.join([self.NORM_INPUT_DIR[ent_type],
+                                  input_filename,
                                   self.NORM_OUTPUT_DIR[ent_type],
+                                  output_filename,
                                   self.NORM_DICT_PATH[ent_type]])
             s.send(send_args.encode('utf-8'))
             s.recv(bufsize)  # wait for normalizer end.
@@ -336,7 +341,7 @@ class Normalizer:
 
             # 3. Read output files of normalizers
             norm_out_path = os.path.join(self.NORM_OUTPUT_DIR[ent_type],
-                                         base_thread_name + '.oid')
+                                         output_filename)
             with open(norm_out_path, 'r') as norm_out_f:
                 for line in norm_out_f:
                     oid = line.rstrip()
@@ -358,7 +363,7 @@ class Normalizer:
         elif ent_type == 'mutation':
             # 1. Write as input files to normalizers
             norm_inp_path = os.path.join(self.NORM_INPUT_DIR[ent_type],
-                                         base_thread_name + '.concept')
+                                         input_filename)
             with open(norm_inp_path, 'w') as norm_inp_f:
                 for name, _ in name_ptr:
                     norm_inp_f.write(name + '\n')
@@ -367,8 +372,10 @@ class Normalizer:
             s = socket.socket()
             s.setsockopt(socket.IPPROTO_TCP, socket.TCP_NODELAY, 1)
             s.connect((self.HOST, self.MUT_PORT))
-            send_args = ' '.join([self.NORM_INPUT_DIR[ent_type],
+            send_args = '\t'.join([self.NORM_INPUT_DIR[ent_type],
+                                  input_filename,
                                   self.NORM_OUTPUT_DIR[ent_type],
+                                  output_filename,
                                   self.NORM_DICT_PATH[ent_type]])
             s.send(send_args.encode('utf-8'))
             s.recv(bufsize)  # wait for normalizer end.
@@ -376,7 +383,7 @@ class Normalizer:
 
             # 3. Read output files of normalizers
             norm_out_path = os.path.join(self.NORM_OUTPUT_DIR[ent_type],
-                                         base_thread_name + '.oid')
+                                         output_filename)
             with open(norm_out_path, 'r') as norm_out_f:
                 for line in norm_out_f:
                     oid = line.rstrip()
@@ -394,7 +401,7 @@ class Normalizer:
         elif ent_type == 'species':
             # 1. Write as input files to normalizers
             norm_inp_path = os.path.join(self.NORM_INPUT_DIR[ent_type],
-                                         base_thread_name + '.concept')
+                                         input_filename)
             with open(norm_inp_path, 'w') as norm_inp_f:
                 for name, _ in name_ptr:
                     norm_inp_f.write(name + '\n')
@@ -403,8 +410,10 @@ class Normalizer:
             s = socket.socket()
             s.setsockopt(socket.IPPROTO_TCP, socket.TCP_NODELAY, 1)
             s.connect((self.HOST, self.SPECIES_PORT))
-            send_args = ' '.join([self.NORM_INPUT_DIR[ent_type],
+            send_args = '\t'.join([self.NORM_INPUT_DIR[ent_type],
+                                  input_filename,
                                   self.NORM_OUTPUT_DIR[ent_type],
+                                  output_filename,
                                   self.NORM_DICT_PATH[ent_type]])
             s.send(send_args.encode('utf-8'))
             s.recv(bufsize)  # wait for normalizer end.
@@ -412,7 +421,7 @@ class Normalizer:
 
             # 3. Read output files of normalizers
             norm_out_path = os.path.join(self.NORM_OUTPUT_DIR[ent_type],
-                                         base_thread_name + '.oid')
+                                         output_filename)
             with open(norm_out_path, 'r') as norm_out_f:
                 for line in norm_out_f:
                     oid = line.rstrip()
@@ -443,7 +452,7 @@ class Normalizer:
 
             # 1. Write as input files to normalizers
             norm_inp_path = os.path.join(self.NORM_INPUT_DIR[ent_type],
-                                         base_thread_name + '.concept')
+                                         input_filename)
             norm_abs_path = os.path.join(self.NORM_INPUT_DIR[ent_type],
                                          base_thread_name + '.txt')
 
@@ -499,8 +508,7 @@ class Normalizer:
             gene_oldbest_dict = \
                 load_auxiliary_dict(self.NORM_DICT_PATH['gene'][2])
             gene_freq_dict = load_auxiliary_dict(self.NORM_DICT_PATH['gene'][3])
-            norm_out_path = os.path.join(gene_output_dir,
-                                         base_thread_name + '.oid')
+            norm_out_path = os.path.join(gene_output_dir, output_filename)
             if os.path.exists(norm_out_path):
                 with open(norm_out_path, 'r') as norm_out_f, \
                         open(norm_inp_path, 'r') as norm_in_f:
