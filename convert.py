@@ -495,6 +495,9 @@ def get_pub_annotation(bern_dict, is_raw_text, elapsed_time_dict=None):
             '%a %b %d %H:%M:%S %z %Y')
     }
 
+    if 'logits' in bern_dict:
+        pa_dict['logits'] = bern_dict['logits']
+
     if elapsed_time_dict is not None:
         pa_dict['elapsed_time'] = elapsed_time_dict
 
