@@ -367,7 +367,7 @@ watch -n 5 "ps auxww | egrep 'python|java|node' | grep -v grep"
     ```
 
 ## Bug report
-Add a new issue to https://github.com/donghyeonk/bern/issues
+Add a new issue to https://github.com/dmis-lab/bern/issues
 
 ## Contact
 donghyeon@korea.ac.kr
