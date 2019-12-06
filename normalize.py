@@ -5,6 +5,8 @@ import socket
 import threading
 
 from normalizers.gene_auxiliary_normalizer import load_auxiliary_dict
+from normalizers.miRNA_normalizer import MiRNAFinder
+from normalizers.pathway_normalizer import PathwayFinder
 
 
 time_format = '[%d/%b/%Y %H:%M:%S.%f]'
@@ -44,6 +46,10 @@ class Normalizer:
                                      'dictionary/best_dict_Mutation.txt'),
             'species': os.path.join(self.BASE_DIR,
                                     'dictionary/best_dict_Species.txt'),
+            'miRNA': os.path.join(self.BASE_DIR,
+                                  'dictionary/best_dict_miRNA.txt'),
+            'pathway': os.path.join(self.BASE_DIR,
+                                    'dictionary/best_dict_Pathway.txt')
         }
 
         self.METADATA_PATH = {
@@ -53,7 +59,11 @@ class Normalizer:
                                     'meta/disease_meta_190310.tsv'),
             'drug': os.path.join(self.BASE_DIR, 'meta/chem_meta.tsv'),
             'mutation': os.path.join(self.BASE_DIR,
-                                     'meta/mutation_synonyms.tsv')
+                                     'meta/mutation_synonyms.tsv'),
+            'miRNA': os.path.join(self.BASE_DIR,
+                                  'dictionary/best_dict_miRNA.txt'),
+            'pathway': os.path.join(self.BASE_DIR,
+                                    'dictionary/best_dict_Pathway.txt')
         }
 
         # Load gid2oid for Gene (only for gene)
@@ -68,6 +78,11 @@ class Normalizer:
                     else:
                         self.gid2oid[gid] = oid
         print('gid2oid loaded', len(self.gid2oid))
+
+        self.gene_oldbest_dict = \
+            load_auxiliary_dict(self.NORM_DICT_PATH['gene'][2])
+        self.gene_freq_dict = \
+            load_auxiliary_dict(self.NORM_DICT_PATH['gene'][3])
 
         # Load gene metadata
         self.gid2meta = dict()
@@ -124,6 +139,9 @@ class Normalizer:
         print('chem meta #ids {}, #ext_ids {}'.format(len(self.cid2meta),
                                                       chem_ext_ids))
 
+        self.mirna_finder = MiRNAFinder(self.NORM_DICT_PATH['miRNA'])
+        self.pathway_finder = PathwayFinder(self.NORM_DICT_PATH['pathway'])
+
         self.NORM_MODEL_VERSION = 'dmis ne norm v.20190830'
 
         self.HOST = '127.0.0.1'
@@ -145,6 +163,9 @@ class Normalizer:
         ent_cnt = 0
         abs_cnt = 0
 
+        num_file_mirna_mentions = 0
+        num_file_pathway_mentions = 0
+
         for item in doc_dict_list:
 
             # Get json values
@@ -165,6 +186,10 @@ class Normalizer:
 
             # Iterate entities per abstract
             for ent_type, locs in entities.items():
+
+                if ent_type in ['miRNA', 'pathway']:
+                    continue
+
                 ent_cnt += len(locs)
                 for loc in locs:
 
@@ -183,9 +208,31 @@ class Normalizer:
                     else:
                         names[ent_type] = [[name, len(saved_items)]]
 
+            # Tag miRNAs
+            found_mirnas = self.mirna_finder.tag(content)
+            entities['miRNA'] = found_mirnas
+            num_found_mirnas = len(found_mirnas)
+            num_file_mirna_mentions += num_found_mirnas
+
+            # Tag pathways
+            found_pathways = self.pathway_finder.tag(content)
+            entities['pathway'] = found_pathways
+            num_found_pathways = len(found_pathways)
+            num_file_pathway_mentions += num_found_pathways
+
             # Work as pointer
             item['norm_model'] = self.NORM_MODEL_VERSION
             saved_items.append(item)
+
+        if num_file_mirna_mentions > 0:
+            print(datetime.now().strftime(time_format),
+                  '[{}] [{}] => {} mentions'.format(cur_thread_name, 'miRNA',
+                                                    num_file_mirna_mentions))
+
+        if num_file_pathway_mentions > 0:
+            print(datetime.now().strftime(time_format),
+                  '[{}] [{}] => {} mentions'.format(cur_thread_name, 'pathway',
+                                                    num_file_pathway_mentions))
 
         # For each entity,
         # 1. Write as input files to normalizers
@@ -211,6 +258,10 @@ class Normalizer:
 
         # Save oids
         for ent_type, type_oids in results:
+
+            if ent_type in ['miRNA', 'pathway']:
+                continue
+
             oid_cnt = 0
             for saved_item in saved_items:
                 for loc in saved_item['entities'][ent_type]:
@@ -505,15 +556,12 @@ class Normalizer:
             s.close()
 
             # 3. Read output files of normalizers
-            gene_oldbest_dict = \
-                load_auxiliary_dict(self.NORM_DICT_PATH['gene'][2])
-            gene_freq_dict = load_auxiliary_dict(self.NORM_DICT_PATH['gene'][3])
             norm_out_path = os.path.join(gene_output_dir, output_filename)
             if os.path.exists(norm_out_path):
                 with open(norm_out_path, 'r') as norm_out_f, \
                         open(norm_inp_path, 'r') as norm_in_f:
-                    for l, input_l in zip(norm_out_f, norm_in_f):
-                        gene_ids, gene_mentions = l.rstrip().split('||'), \
+                    for line, input_l in zip(norm_out_f, norm_in_f):
+                        gene_ids, gene_mentions = line.rstrip().split('||'), \
                                                   input_l.rstrip().split('||')
                         for gene_id, gene_mention in zip(gene_ids,
                                                          gene_mentions):
@@ -525,10 +573,10 @@ class Normalizer:
 
                             if gene_id in self.gid2oid:
                                 eid = self.gid2oid[gene_id]
-                            elif gene_mention in gene_oldbest_dict:
-                                eid = gene_oldbest_dict[gene_mention]
-                            elif gene_mention in gene_freq_dict:
-                                eid = gene_freq_dict[gene_mention]
+                            elif gene_mention in self.gene_oldbest_dict:
+                                eid = self.gene_oldbest_dict[gene_mention]
+                            elif gene_mention in self.gene_freq_dict:
+                                eid = self.gene_freq_dict[gene_mention]
 
                             meta = self.gid2meta.get(gene_id, '')
                             if len(meta) > 0:
