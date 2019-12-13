@@ -38,7 +38,7 @@ def load_auxiliary_dict(path):
     with open(path, 'r', encoding='utf-8') as f:
         for line in f:
             line = line.split('||')
-            uid, mention = int(line[0].strip()), line[1].strip()
+            uid, mention = line[0].strip(), line[1].strip()
             assert mention not in auxiliary_dict
             auxiliary_dict[mention] = uid
     return auxiliary_dict
