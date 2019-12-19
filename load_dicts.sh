@@ -10,6 +10,6 @@ nohup java -Xmx16G -jar resources/normalizers/disease/disease_normalizer_19.jar 
 
 # Gene (working dir: normalization/resources/normalizers/gene/, port:18888)
 cd resources/normalizers/gene/
-nohup java -Xmx20G -jar GNormPlus_180921.jar >> ../../../../logs/nohup_gene.out 2>&1 &
+nohup java -Xmx20G -jar gnormplus-normalization_19.jar >> ../../../../logs/nohup_gene.out 2>&1 &
 
 ps auxww | egrep 'python|java' | grep -v grep
