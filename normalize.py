@@ -41,7 +41,9 @@ class Normalizer:
                      os.path.join(self.BASE_DIR,
                                   'dictionary/best_dict_Gene_oldbest.txt'),
                      os.path.join(self.BASE_DIR,
-                                  'dictionary/best_dict_Gene_freq.txt')],
+                                  'dictionary/best_dict_Gene_freq.txt'),
+                     os.path.join(self.BASE_DIR,
+                                  'dictionary_rev/gene.tsv')],
             'mutation': os.path.join(self.BASE_DIR,
                                      'dictionary/best_dict_Mutation.txt'),
             'species': os.path.join(self.BASE_DIR,
@@ -70,7 +72,7 @@ class Normalizer:
         self.gid2oid = dict()
         with open(self.NORM_DICT_PATH['gene'][1], 'r', encoding='utf-8') as f:
             for line in f:
-                oid, gids = line.rstrip().split('||')
+                oid, gids = line[:-1].split('||')
                 for gid in gids.split('|'):
                     bar_idx = gid.find('-')
                     if bar_idx > -1:
@@ -84,14 +86,22 @@ class Normalizer:
         self.gene_freq_dict = \
             load_auxiliary_dict(self.NORM_DICT_PATH['gene'][3])
 
+        # to merge genes
+        self.goid2goid = dict()
+        with open(self.NORM_DICT_PATH['gene'][4], 'r', encoding='utf-8') as f:
+            for line in f:
+                cols = line[:-1].split('\t')
+                self.goid2goid[cols[0]] = cols[1]
+        print('goid2goid loaded', len(self.goid2goid))
+
         # Load gene metadata
         self.gid2meta = dict()
         gene_ext_ids = 0
         with open(self.METADATA_PATH['gene'], 'r', encoding='utf-8') as f:
             for line in f:
-                cols = line.rstrip().split('\t')
+                cols = line[:-1].split('\t')
                 if len(cols) < 2:
-                    print('#cols', len(cols), line.rstrip())
+                    print('#cols', len(cols), line[:-1])
                     continue
 
                 external_ids = cols[1]
@@ -116,9 +126,9 @@ class Normalizer:
         disease_ext_ids = 0
         with open(self.METADATA_PATH['disease'], 'r', encoding='utf-8') as f:
             for line in f:
-                cols = line.rstrip().split('\t')
+                cols = line[:-1].split('\t')
                 if len(cols) < 2:
-                    print('#cols', len(cols), line.rstrip())
+                    print('#cols', len(cols), line[:-1])
                     continue
                 self.did2meta[cols[0]] = cols[1].replace(',', '\t')
                 disease_ext_ids += len(cols[1].split(','))
@@ -130,9 +140,9 @@ class Normalizer:
         chem_ext_ids = 0
         with open(self.METADATA_PATH['drug'], 'r', encoding='utf-8') as f:
             for line in f:
-                cols = line.rstrip().split('\t')
+                cols = line[:-1].split('\t')
                 if len(cols) < 2:
-                    print('#cols', len(cols), line.rstrip())
+                    print('#cols', len(cols), line[:-1])
                     continue
                 self.cid2meta[cols[0]] = cols[1].replace(',', '\t')
                 chem_ext_ids += len(cols[1].split(','))
@@ -331,7 +341,7 @@ class Normalizer:
             if os.path.exists(norm_out_path):
                 with open(norm_out_path, 'r') as norm_out_f:
                     for line in norm_out_f:
-                        disease_ids = line.rstrip()
+                        disease_ids = line[:-1]
 
                         if '|' in disease_ids:  # multiple
                             bern_disease_ids = list()
@@ -395,7 +405,7 @@ class Normalizer:
                                          output_filename)
             with open(norm_out_path, 'r') as norm_out_f:
                 for line in norm_out_f:
-                    oid = line.rstrip()
+                    oid = line[:-1]
                     meta = self.cid2meta.get(oid, '')
                     if meta != '':
                         oids.append(meta + '\tBERN:' + oid)
@@ -437,7 +447,7 @@ class Normalizer:
                                          output_filename)
             with open(norm_out_path, 'r') as norm_out_f:
                 for line in norm_out_f:
-                    oid = line.rstrip()
+                    oid = line[:-1]
                     if oid != self.NO_ENTITY_ID:
                         oids.append('BERN:' + oid)
                     else:
@@ -475,7 +485,7 @@ class Normalizer:
                                          output_filename)
             with open(norm_out_path, 'r') as norm_out_f:
                 for line in norm_out_f:
-                    oid = line.rstrip()
+                    oid = line[:-1]
                     if oid != self.NO_ENTITY_ID:
                         oid = int(oid) // 100
                         # https://www.ncbi.nlm.nih.gov/Taxonomy/Browser/wwwtax.cgi?id=10095
@@ -561,8 +571,8 @@ class Normalizer:
                 with open(norm_out_path, 'r') as norm_out_f, \
                         open(norm_inp_path, 'r') as norm_in_f:
                     for line, input_l in zip(norm_out_f, norm_in_f):
-                        gene_ids, gene_mentions = line.rstrip().split('||'), \
-                                                  input_l.rstrip().split('||')
+                        gene_ids, gene_mentions = line[:-1].split('||'), \
+                                                  input_l[:-1].split('||')
                         for gene_id, gene_mention in zip(gene_ids,
                                                          gene_mentions):
                             bar_idx = gene_id.find('-')
@@ -577,6 +587,9 @@ class Normalizer:
                                 eid = self.gene_oldbest_dict[gene_mention]
                             elif gene_mention in self.gene_freq_dict:
                                 eid = self.gene_freq_dict[gene_mention]
+
+                            if eid is not None and eid in self.goid2goid:
+                                eid = self.goid2goid[eid]
 
                             meta = self.gid2meta.get(gene_id, '')
                             if len(meta) > 0:
