@@ -365,7 +365,8 @@ class GetHandler(BaseHTTPRequestHandler):
 
     def tag_entities(self, text, cur_thread_name, is_raw_text, reuse=False):
         assert self.stm_dict is not None
-
+        get_start_t = time.time()
+        elapsed_time_dict = dict()
         n_ascii_letters = 0
         for l in text:
             if l not in string.ascii_letters:
@@ -412,9 +413,11 @@ class GetHandler(BaseHTTPRequestHandler):
         tell_inputfile(self.stm_dict['gnormplus_host'],
                        self.stm_dict['gnormplus_port'],
                        '{}.PubTator'.format(text_hash))
+        gnormplus_time = time.time() - gnormplus_start_time
+        elapsed_time_dict['gnormplus'] = round(gnormplus_time, 3)
         print(datetime.now().strftime(self.stm_dict['time_format']),
               '[{}] GNormPlus {:.3f} sec'
-              .format(cur_thread_name, time.time() - gnormplus_start_time))
+              .format(cur_thread_name, gnormplus_time))
 
         # Move a GNormPlus output file to the tmVar2 input directory
         shutil.move(output_gnormplus, input_tmvar2)
@@ -424,9 +427,11 @@ class GetHandler(BaseHTTPRequestHandler):
         tell_inputfile(self.stm_dict['tmvar2_host'],
                        self.stm_dict['tmvar2_port'],
                        '{}.PubTator'.format(text_hash))
+        tmvar2_time = time.time() - tmvar2_start_time
+        elapsed_time_dict['tmvar2'] = round(tmvar2_time, 3)
         print(datetime.now().strftime(self.stm_dict['time_format']),
               '[{}] tmVar 2.0 {:.3f} sec'
-              .format(cur_thread_name, time.time() - tmvar2_start_time))
+              .format(cur_thread_name, tmvar2_time))
 
         # Convert tmVar 2.0 outputs (?.PubTator.PubTator) to python dict
         dict_list = pubtator2dict_list(output_tmvar2, is_raw_text=True)
@@ -442,28 +447,36 @@ class GetHandler(BaseHTTPRequestHandler):
             return None
 
         # Run BioBERT of Lee et al., 2019
-        start_time = time.time()
+        ner_start_time = time.time()
         tagged_docs, num_entities = \
             self.biobert_recognize(dict_list, is_raw_text, cur_thread_name)
         if tagged_docs is None:
             return None
 
         assert len(tagged_docs) == 1
+        ner_time = time.time() - ner_start_time
+        elapsed_time_dict['ner'] = round(ner_time, 3)
         print(datetime.now().strftime(self.stm_dict['time_format']),
               '[%s] NER %.3f sec, #entities: %d' %
-              (cur_thread_name, time.time() - start_time, num_entities))
+              (cur_thread_name, ner_time, num_entities))
 
         # Normalization models
+        normalization_time = 0.
         if num_entities > 0:
+            normalization_start_time = time.time()
             # print(datetime.now().strftime(time_format),
             #       '[{}] Normalization models..'.format(cur_thread_name))
             tagged_docs = self.normalizer.normalize(text_hash, tagged_docs,
                                                     cur_thread_name,
                                                     is_raw_text=is_raw_text)
+            normalization_time = time.time() - normalization_start_time
+        elapsed_time_dict['normalization'] = round(normalization_time, 3)
 
         # Convert to PubAnnotation JSON
+        elapsed_time_dict['total'] = round(time.time() - get_start_t, 3)
         tagged_docs[0] = get_pub_annotation(tagged_docs[0],
-                                            is_raw_text=is_raw_text)
+                                            is_raw_text=is_raw_text,
+                                            elapsed_time_dict=elapsed_time_dict)
 
         # Save a BERN result
         with open(bern_output_path, 'w', encoding='utf-8') as f_out:
