@@ -9,7 +9,7 @@ BERN is a BioBERT-based multi-type NER tool that also supports normalization of 
 
 **Done - Server check 2019-07-18 8:20 AM - 1:30 PM (UTC-0)**
 
-![BERN](https://github.com/donghyeonk/bern/blob/master/bern_overview.jpg?raw=true)
+![BERN](https://github.com/dmis-lab/bern/blob/master/bern_overview.jpg?raw=true)
 <p align="center">Overview of BERN.</p>
 
 The description below gives instructions on hosting your own BERN. Please refer to https://bern.korea.ac.kr for the RESTful Web service of BERN.
