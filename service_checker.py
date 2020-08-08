@@ -172,7 +172,7 @@ def benchmark(tries, batch_size=None, log_interval=100):
 
 
 def get_stats(lst, batch_size=None):
-    if lst is None or len(lst) == 0:
+    if not lst:
         return None
 
     if batch_size is None:

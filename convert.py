@@ -547,12 +547,13 @@ def bern2pub_annotation(entity_dict):
             entity_list.append(entity_pa_dict)
 
     # sort by span begin
-    def get_begin(item):
+    def get_item_key1(item):
         return item['span']['begin']
 
-    entity_list = sorted(entity_list, key=get_begin)
+    def get_item_key2(item):
+        return item['obj']
 
-    return entity_list
+    return sorted(sorted(entity_list, key=get_item_key2), key=get_item_key1)
 
 
 def get_pubtator(bern_dict_list):

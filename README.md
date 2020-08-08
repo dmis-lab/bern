@@ -75,7 +75,7 @@ rm crfpp-0.58.tar.gz
 wget --load-cookies /tmp/cookies.txt "https://docs.google.com/uc?export=download&confirm=$(wget --quiet --save-cookies /tmp/cookies.txt --keep-session-cookies --no-check-certificate 'https://docs.google.com/uc?export=download&id=1g-JlhqeDIlZX5YFk8Y27_M8BXUXcQRSX' -O- | sed -rn 's/.*confirm=([0-9A-Za-z_]+).*/\1\n/p')&id=1g-JlhqeDIlZX5YFk8Y27_M8BXUXcQRSX" -O GNormPlusServer.jar && rm -rf /tmp/cookies.txt
 
 # Start GNormPlusServer
-nohup java -Xmx16G -Xms16G -jar GNormPlusServer.jar 18895 2>&1 &
+nohup java -Xmx16G -Xms16G -jar GNormPlusServer.jar 18895 >> ~/bern/logs/nohup_gnormplus.out 2>&1 &
 ```
 
 
@@ -110,7 +110,7 @@ wget https://repo1.maven.org/maven2/org/xerial/sqlite-jdbc/3.20.0/sqlite-jdbc-3.
 wget https://repo1.maven.org/maven2/edu/stanford/nlp/stanford-corenlp/3.5.2/stanford-corenlp-3.5.2.jar
 
 # Start tmVar2Server
-nohup java -Xmx8G -Xms8G -jar tmVar2Server.jar 18896 2>&1 &
+nohup java -Xmx8G -Xms8G -jar tmVar2Server.jar 18896 >> ~/bern/logs/nohup_tmvar.out 2>&1 &
 ```
  
 * Download normalization resources and pre-trained BioBERT NER models
@@ -324,11 +324,11 @@ tail -F logs/nohup_BERN.out
 ```
 # Start GNormPlusServer
 cd ~/bern/GNormPlusJava
-nohup java -Xmx16G -Xms16G -jar GNormPlusServer.jar 18895 2>&1 &
+nohup java -Xmx16G -Xms16G -jar GNormPlusServer.jar 18895 >> ~/bern/logs/nohup_gnormplus.out 2>&1 &
 
 # Start tmVar2Server
 cd ~/bern/tmVarJava
-nohup java -Xmx8G -Xms8G -jar tmVar2Server.jar 18896 2>&1 &
+nohup java -Xmx8G -Xms8G -jar tmVar2Server.jar 18896 >> ~/bern/logs/nohup_tmvar.out 2>&1 &
 
 # Start normalizers
 cd ~/bern/

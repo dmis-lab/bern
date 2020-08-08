@@ -302,8 +302,7 @@ class GetHandler(BaseHTTPRequestHandler):
                   '[' + cur_thread_name + ']', err_msg)
             self.wfile.write(json.dumps(err_msg).encode('utf-8'))
             return
-
-        if len(text.strip()) == 0:
+        elif not text.strip() or text.isspace():
             err_msg = [{"error": "only whitespace letters"}]
             print(datetime.now().strftime(time_format),
                   '[' + cur_thread_name + ']', err_msg)
@@ -337,9 +336,16 @@ class GetHandler(BaseHTTPRequestHandler):
         return
 
     def preprocess_input(self, text, cur_thread_name):
+
+        if '\r\n' in text:
+            print(datetime.now().strftime(self.stm_dict['time_format']),
+                  '[{}] Found a CRLF -> replace it w/ a space'
+                  .format(cur_thread_name))
+            text = text.replace('\r\n', ' ')
+
         if '\n' in text:
             print(datetime.now().strftime(self.stm_dict['time_format']),
-                  '[{}] Found a line break -> replace w/ a space'
+                  '[{}] Found a line break -> replace it w/ a space'
                   .format(cur_thread_name))
             text = text.replace('\n', ' ')
 
@@ -365,8 +371,7 @@ class GetHandler(BaseHTTPRequestHandler):
 
     def tag_entities(self, text, cur_thread_name, is_raw_text, reuse=False):
         assert self.stm_dict is not None
-        get_start_t = time.time()
-        elapsed_time_dict = dict()
+
         n_ascii_letters = 0
         for l in text:
             if l not in string.ascii_letters:
@@ -384,54 +389,56 @@ class GetHandler(BaseHTTPRequestHandler):
 
         if reuse and os.path.exists(bern_output_path):
             print(datetime.now().strftime(self.stm_dict['time_format']),
-                  '[{}] Found prev. output'.format(cur_thread_name))
+                  f'[{cur_thread_name}] Found prev. output')
             with open(bern_output_path, 'r', encoding='utf-8') as f_out:
                 return json.load(f_out)
 
+        pubtator_file = f'{text_hash}-{cur_thread_name}.PubTator'
         home_gnormplus = self.stm_dict['gnormplus_home']
-        input_gnormplus = os.path.join(home_gnormplus, 'input',
-                                       '{}.PubTator'.format(text_hash))
-        output_gnormplus = os.path.join(home_gnormplus, 'output',
-                                        '{}.PubTator'.format(text_hash))
+        input_gnormplus = os.path.join(home_gnormplus, 'input', pubtator_file)
+        output_gnormplus = os.path.join(home_gnormplus, 'output', pubtator_file)
 
         home_tmvar2 = self.stm_dict['tmvar2_home']
         input_dir_tmvar2 = os.path.join(home_tmvar2, 'input')
-        input_tmvar2 = os.path.join(input_dir_tmvar2,
-                                    '{}.PubTator'.format(text_hash))
+        input_tmvar2 = os.path.join(input_dir_tmvar2, pubtator_file)
         output_tmvar2 = os.path.join(home_tmvar2, 'output',
-                                     '{}.PubTator.PubTator'.format(text_hash))
+                                     f'{pubtator_file}.PubTator')
 
         # Write input str to a .PubTator format file
         with open(input_gnormplus, 'w', encoding='utf-8') as f:
-            # only title
-            f.write(text_hash + '|t|')
-            f.write('\n')
-            f.write(text_hash + '|a|' + text + '\n\n')
+            # only abstract
+            f.write(f'{text_hash}-{cur_thread_name}|t|\n')
+            f.write(f'{text_hash}-{cur_thread_name}|a|{text}\n\n')
 
         # Run GNormPlus
         gnormplus_start_time = time.time()
-        tell_inputfile(self.stm_dict['gnormplus_host'],
-                       self.stm_dict['gnormplus_port'],
-                       '{}.PubTator'.format(text_hash))
-        gnormplus_time = time.time() - gnormplus_start_time
-        elapsed_time_dict['gnormplus'] = round(gnormplus_time, 3)
+        gnormplus_resp = tell_inputfile(self.stm_dict['gnormplus_host'],
+                                        self.stm_dict['gnormplus_port'],
+                                        pubtator_file)
+        if gnormplus_resp is None:
+            os.remove(input_gnormplus)
+            return None
+
         print(datetime.now().strftime(self.stm_dict['time_format']),
               '[{}] GNormPlus {:.3f} sec'
-              .format(cur_thread_name, gnormplus_time))
+              .format(cur_thread_name, time.time() - gnormplus_start_time))
 
         # Move a GNormPlus output file to the tmVar2 input directory
         shutil.move(output_gnormplus, input_tmvar2)
 
         # Run tmVar 2.0
         tmvar2_start_time = time.time()
-        tell_inputfile(self.stm_dict['tmvar2_host'],
-                       self.stm_dict['tmvar2_port'],
-                       '{}.PubTator'.format(text_hash))
-        tmvar2_time = time.time() - tmvar2_start_time
-        elapsed_time_dict['tmvar2'] = round(tmvar2_time, 3)
+        tmvar2_resp = tell_inputfile(self.stm_dict['tmvar2_host'],
+                                     self.stm_dict['tmvar2_port'],
+                                     pubtator_file)
+        if tmvar2_resp is None:
+            os.remove(input_gnormplus)
+            os.remove(input_tmvar2)
+            return None
+
         print(datetime.now().strftime(self.stm_dict['time_format']),
               '[{}] tmVar 2.0 {:.3f} sec'
-              .format(cur_thread_name, tmvar2_time))
+              .format(cur_thread_name, time.time() - tmvar2_start_time))
 
         # Convert tmVar 2.0 outputs (?.PubTator.PubTator) to python dict
         dict_list = pubtator2dict_list(output_tmvar2, is_raw_text=True)
@@ -447,40 +454,32 @@ class GetHandler(BaseHTTPRequestHandler):
             return None
 
         # Run BioBERT of Lee et al., 2019
-        ner_start_time = time.time()
+        start_time = time.time()
         tagged_docs, num_entities = \
             self.biobert_recognize(dict_list, is_raw_text, cur_thread_name)
         if tagged_docs is None:
             return None
 
         assert len(tagged_docs) == 1
-        ner_time = time.time() - ner_start_time
-        elapsed_time_dict['ner'] = round(ner_time, 3)
         print(datetime.now().strftime(self.stm_dict['time_format']),
               '[%s] NER %.3f sec, #entities: %d' %
-              (cur_thread_name, ner_time, num_entities))
+              (cur_thread_name, time.time() - start_time, num_entities))
 
         # Normalization models
-        normalization_time = 0.
         if num_entities > 0:
-            normalization_start_time = time.time()
             # print(datetime.now().strftime(time_format),
             #       '[{}] Normalization models..'.format(cur_thread_name))
             tagged_docs = self.normalizer.normalize(text_hash, tagged_docs,
                                                     cur_thread_name,
                                                     is_raw_text=is_raw_text)
-            normalization_time = time.time() - normalization_start_time
-        elapsed_time_dict['normalization'] = round(normalization_time, 3)
 
         # Convert to PubAnnotation JSON
-        elapsed_time_dict['total'] = round(time.time() - get_start_t, 3)
         tagged_docs[0] = get_pub_annotation(tagged_docs[0],
-                                            is_raw_text=is_raw_text,
-                                            elapsed_time_dict=elapsed_time_dict)
+                                            is_raw_text=is_raw_text)
 
-        # Save a BERN result
-        with open(bern_output_path, 'w', encoding='utf-8') as f_out:
-            json.dump(tagged_docs[0], f_out, sort_keys=True)
+        # # Save a BERN result
+        # with open(bern_output_path, 'w', encoding='utf-8') as f_out:
+        #     json.dump(tagged_docs[0], f_out, sort_keys=True)
 
         return tagged_docs[0]
 
@@ -544,37 +543,49 @@ def tell_inputfile(host, port, inputfile):
     sock.setsockopt(socket.IPPROTO_TCP, socket.TCP_NODELAY, 1)
     try:
         sock.connect((host, port))
-    except ConnectionRefusedError as cre:
-        print(cre)
-        from utils import send_mail
-        from service_checker import FROM_GMAIL_ADDR, FROM_GMAIL_ACCOUNT_PASSWORD, \
-            TO_EMAIL_ADDR
-        send_mail(FROM_GMAIL_ADDR, TO_EMAIL_ADDR,
-                  '[BERN] Error: Connection refused',
-                  'inputfile: ' + inputfile,
-                  FROM_GMAIL_ADDR, FROM_GMAIL_ACCOUNT_PASSWORD)
+        input_str = inputfile
+        input_stream = struct.pack('>H', len(input_str)) + input_str.encode(
+            'utf-8')
+        sock.send(input_stream)
 
-    input_str = inputfile
-    input_stream = struct.pack('>H', len(input_str)) + input_str.encode('utf-8')
-    sock.send(input_stream)
+        output_stream = sock.recv(512)
+        resp = output_stream.decode('utf-8')[2:]
 
-    output_stream = sock.recv(512)
-    resp = output_stream.decode('utf-8')[2:]
-
-    sock.close()
-    return resp
+        sock.close()
+        return resp
+    except ConnectionRefusedError as e:
+        print(e)
+        # from utils import send_mail
+        # from service_checker import FROM_GMAIL_ADDR, \
+        #     FROM_GMAIL_ACCOUNT_PASSWORD, \
+        #     TO_EMAIL_ADDR
+        # send_mail(FROM_GMAIL_ADDR, TO_EMAIL_ADDR,
+        #           '[BERN] Error: {}\n'.format(type(e)),
+        #           'host:port= {}:{}\ninputfile: {}'.format(
+        #               host, port, inputfile),
+        #           FROM_GMAIL_ADDR, FROM_GMAIL_ACCOUNT_PASSWORD)
+        return None
+    except TimeoutError as e:
+        print(e)
+        return None
+    except ConnectionResetError as e:
+        print(e)
+        return None
 
 
 def delete_files(dirname):
     if not os.path.exists(dirname):
         return
 
+    n_deleted = 0
     for f in os.listdir(dirname):
         f_path = os.path.join(dirname, f)
         if not os.path.isfile(f_path):
             continue
-        print('Delete', f_path)
+        # print('Delete', f_path)
         os.remove(f_path)
+        n_deleted += 1
+    print(dirname, n_deleted)
 
 
 class Main:
@@ -635,6 +646,7 @@ class Main:
 
         delete_files(os.path.join(params.gnormplus_home, 'input'))
         delete_files(os.path.join(params.tmvar2_home, 'input'))
+        delete_files(os.path.join('./biobert_ner', 'tmp'))
 
         print(datetime.now().strftime(params.time_format),
               'Starting server at http://{}:{}'.format(params.ip, params.port))
