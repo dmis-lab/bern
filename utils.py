@@ -294,6 +294,7 @@ def filter_entities(ner_results, is_raw_text):
         for spcs in species:
             entity_mention = content[spcs['start']:spcs['end']+1]
             if entity_mention in species_human_excl_homo_sapiens:
+                spcs['end'] += 1
                 continue
             valid_species.append(spcs)
 
