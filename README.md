@@ -21,7 +21,7 @@ The description below gives instructions on hosting your own BERN. Please refer 
 
 ## Requirements
 * Environment
-    * Python 3
+    * Python >= 3.6 
     * CUDA 9 or higher
 * Main components
     * [BioBERT NER models (Lee et al., 2019)](https://arxiv.org/abs/1901.08746)
