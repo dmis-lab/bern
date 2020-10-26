@@ -160,7 +160,7 @@ tail -F logs/nohup_BERN.out
         print(result_dict)
         ```
 
-# BERN in Docker
+## BERN in Docker
 
 Build and run BERN in a single container::
 
