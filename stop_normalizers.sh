@@ -1,11 +1,11 @@
 #!/usr/bin/env bash
 
-pid=`ps auxww | grep GNormPlus_180921.jar | grep -v grep | awk '{print $2}' | sort -r`
+pid=`ps auxww | grep gene_normalizer_19.jar | grep -v grep | awk '{print $2}' | sort -r`
 if [ "$pid" != "" ]; then
   kill -9 "$pid"
-  echo "Stopped GNormPlus_180921.jar"
+  echo "Stopped gene_normalizer_19.jar"
 else
-  echo "No GNormPlus_180921.jar found to stop."
+  echo "No gene_normalizer_19.jar found to stop."
 fi
 
 pid=`ps auxww | grep species_normalizer.py | grep -v grep | awk '{print $2}' | sort -r`
