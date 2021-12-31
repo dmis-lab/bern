@@ -9,7 +9,7 @@ BERN is a BioBERT-based multi-type NER tool that also supports normalization of 
 **Done - Server down due to air conditioning problems in our server room 2019-10-10 - 2019-10-11 7:55 AM (UTC-0)**  
 
 **Fixed our disease normalizer 2019-08-19, 2019-08-10 and 2019-08-02 issues**
-1. Download disease_normalizer_19.jar at [this URL](https://drive.google.com/open?id=1YbAanyQJ24PPBOu0NO8a1aCxWLdlQhk-) and place the file under normalization/resources/normalizers/disease directory.   
+1. Download gnormplus-normalization_19.jar at [this URL](https://drive.google.com/open?id=1YbAanyQJ24PPBOu0NO8a1aCxWLdlQhk-) and place the file under normalization/resources/normalizers/disease directory.   
 2. Stop normalizers by running stop_normalizers.sh and restart the normalizers by running load_dicts.sh 
 
 **Done - Server check 2019-07-18 8:20 AM - 1:30 PM (UTC-0)**
