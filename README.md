@@ -3,7 +3,7 @@ BERN is a BioBERT-based multi-type NER tool that also supports normalization of 
 
 **[Updates]**
 
-***** **Check out [BERN2](http://bern2.korea.ac.kr), an improved version of BERN with much faster and more accurate inference!** *****
+***** **Check out [BERN2](https://github.com/dmis-lab/BERN2), an improved version of BERN with much faster and more accurate inference!** *****
 
 **Fixed our gene normalizer to respond to issues between 2020-03-12 and 2020-03-13**
 1. Download gnormplus-normalization_19.jar at [this URL](https://drive.google.com/open?id=1ZTKJyRLBeqG2ioTtUqvmW0C_H6PmHZGl) and place (overwrite) the file under normalization/resources/normalizers/gene directory.  
