@@ -164,6 +164,12 @@ tail -F logs/nohup_BERN.out
         print(result_dict)
         ```
 
+## BERN in Docker
+
+Build and run BERN in a single container::
+
+    docker build --tag bern_service_component:1.0 . && docker run --publish 8888:8888 --detach --name bern bern_service_component:1.0
+
 ## Result
 <details>
     <summary>See a result example in JSON (PMID:29446767) </summary>
@@ -350,7 +356,6 @@ nohup python3 -u server.py --port 8888 --gnormplus_home ~/bern/GNormPlusJava --g
 # Print logs
 tail -F logs/nohup_BERN.out
 ```
-
 
 ## Troubleshooting
 * Trouble: It takes a long time to get results. 
